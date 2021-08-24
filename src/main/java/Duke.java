@@ -125,9 +125,9 @@ public class Duke {
 
         private static void removeCommand(int i) {
             if (arrayList.size() < i) {
-                System.out.println("____________________________________________________________");
-                System.out.println("Sorry! There are no tasks with index number " + i + "! :(");
-                System.out.println("____________________________________________________________");
+                System.out.println("____________________________________________________________\n" +
+                        "Sorry! There are no tasks with index number \" + i + \"! :( \n" +
+                        "____________________________________________________________");
             } else {
                 Task iTask = arrayList.get(i - 1);
                 int removedSize = arrayList.size() - 1;
