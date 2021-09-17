@@ -1,3 +1,6 @@
+import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
+
 public class Commands {
     private static TaskList tasks;
     private static final String EMPTY_COMMAND_1 = "\n____________________________________________________________\n" +
@@ -32,70 +35,63 @@ public class Commands {
     public static void addCommand(String inputString) throws DukeException {
         String[] word = inputString.split(" ", 2);
         String command = word[0];
-        if(!command.equals("todo") && !command.equals("deadline") && !command.equals("event")) {
-            throw new DukeException(NO_COMMAND);
-        } else {
-            if (word.length < 2) {
-                switch (command) {
-                    case "todo": {
+        String desc = word[1];
+        try {
+            switch (command) {
+                case "todo": {
+                    if (desc == null) {
                         throw new DukeException(EMPTY_COMMAND_1);
                     }
-                    case "deadline": {
-                        throw new DukeException(EMPTY_COMMAND_2);
-                    }
-                    case "event": {
-                        throw new DukeException(EMPTY_COMMAND_3);
-                    }
+                    ToDo task = new ToDo(desc);
+                    System.out.println("____________________________________________________________\n" +
+                            "Got it. I've added this task: \n" + task.toString());
+                    tasks.add(task);
+                    System.out.println("Now you have " + tasks.size() + " task(s) in the list. \n" +
+                            "____________________________________________________________");
+                    break;
                 }
-            } else {
-                String desc = word[1];
-                switch (command) {
-                    case "todo":
-                    {
-                        ToDo task = new ToDo(desc);
+                case "deadline": {
+                    String[] descriptions = desc.split("/", 2);
+                    String description = descriptions[0];
+                    if (descriptions.length == 0) {
+                        throw new DukeException(WRONG_COMMAND_1);
+                    } else if (descriptions.length == 1) {
+                        throw new DukeException(EMPTY_COMMAND_2);
+                    } else {
+                        LocalDate timeline = LocalDate.parse(descriptions[1]);
+                        Deadline task = new Deadline(description, timeline);
                         System.out.println("____________________________________________________________\n" +
                                 "Got it. I've added this task: \n" + task.toString());
                         tasks.add(task);
                         System.out.println("Now you have " + tasks.size() + " task(s) in the list. \n" +
                                 "____________________________________________________________");
-                        break;
                     }
-                    case "deadline": {
-                        String[] descriptions = desc.split("/", 2);
-                        String description = descriptions[0];
-                        if (descriptions.length < 2) {
-                            throw new DukeException(WRONG_COMMAND_1);
-                        } else {
-                            String timeline = descriptions[1];
-                            Deadline task = new Deadline(description, timeline);
-                            System.out.println("____________________________________________________________\n" +
-                                    "Got it. I've added this task: \n" + task.toString());
-                            tasks.add(task);
-                            System.out.println("Now you have " + tasks.size() + " task(s) in the list. \n" +
-                                    "____________________________________________________________");
-                        }
-                        break;
-                    }
-                    case "event": {
-                        String[] descriptions = desc.split("/", 2);
-                        String description = descriptions[0];
-                        if (descriptions.length < 2) {
-                            throw new DukeException(WRONG_COMMAND_2);
-                        } else {
-                            String timeline = descriptions[1];
-                            Event task = new Event(description, timeline);
-                            System.out.println("____________________________________________________________\n" +
-                                    "Got it. I've added this task: \n" + task.toString());
-                            tasks.add(task);
-                            System.out.println("Now you have " + tasks.size() + " task(s) in the list. \n" +
-                                    "____________________________________________________________");
-                        }
-                        break;
-                    }
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + command);
+                    break;
                 }
+                case "event": {
+                    String[] descriptions = desc.split("/", 2);
+                    String description = descriptions[0];
+                    if (descriptions.length == 0) {
+                        throw new DukeException(WRONG_COMMAND_2);
+                    } else if (descriptions.length == 1) {
+                        throw new DukeException(EMPTY_COMMAND_3);
+                    } else {
+                        LocalDate timeline = LocalDate.parse(descriptions[1]);
+                        Event task = new Event(description, timeline);
+                        System.out.println("____________________________________________________________\n" +
+                                "Got it. I've added this task: \n" + task.toString());
+                        tasks.add(task);
+                        System.out.println("Now you have " + tasks.size() + " task(s) in the list. \n" +
+                                "____________________________________________________________");
+                    }
+                }
+                default:
+                    throw new DukeException(NO_COMMAND);
             }
+        } catch (DukeException e) {
+            System.out.println(e.getMessage());
+        } catch (DateTimeParseException e) {
+            System.out.println(e.getMessage());
         }
     }
 
